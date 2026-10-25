@@ -1,0 +1,21 @@
+# --- environment / secrets ---
+.env
+backend/.env
+.venv/
+venv/
+env/
+
+# --- python caches ---
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- node / frontend build ---
+node_modules/
+frontend/dist/
+
+# --- agent tooling (not part of the capstone deliverable) ---
+.emergent/
+.screenshots/
+test_reports/
+memory/

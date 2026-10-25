@@ -1,0 +1,1460 @@
+{
+  "audit": {
+    "figures": {
+      "raw_order_rows": 13084,
+      "exact_duplicate_rows": 119,
+      "pending_rows": 656,
+      "distinct_order_ids": 12309,
+      "non_numeric_amounts": 120,
+      "negative_delivery_minutes": 106,
+      "blank_delivery_minutes": 2541,
+      "blank_ages": 61,
+      "ages_outside_10_100": 6,
+      "raw_city_spellings": 24,
+      "raw_gender_spellings": 10,
+      "blank_genders": 30
+    },
+    "tables": [
+      {
+        "table": "customers",
+        "rows": 1200,
+        "columns": 5,
+        "column_missing": [
+          {
+            "column": "customer_id",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "city",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "signup_date",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "age",
+            "dtype": "float64",
+            "missing": 61,
+            "missing_pct": 5.08
+          },
+          {
+            "column": "gender",
+            "dtype": "str",
+            "missing": 30,
+            "missing_pct": 2.5
+          }
+        ]
+      },
+      {
+        "table": "products",
+        "rows": 40,
+        "columns": 4,
+        "column_missing": [
+          {
+            "column": "product_id",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "product_name",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "category",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "price_inr",
+            "dtype": "int64",
+            "missing": 0,
+            "missing_pct": 0.0
+          }
+        ]
+      },
+      {
+        "table": "orders",
+        "rows": 13084,
+        "columns": 9,
+        "column_missing": [
+          {
+            "column": "order_id",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "customer_id",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "product_id",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "quantity",
+            "dtype": "int64",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "order_ts",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "status",
+            "dtype": "str",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "discount_pct",
+            "dtype": "int64",
+            "missing": 0,
+            "missing_pct": 0.0
+          },
+          {
+            "column": "order_amount",
+            "dtype": "str",
+            "missing": 53,
+            "missing_pct": 0.41
+          },
+          {
+            "column": "delivery_minutes",
+            "dtype": "float64",
+            "missing": 2541,
+            "missing_pct": 19.42
+          }
+        ]
+      }
+    ]
+  },
+  "cleaning": {
+    "customers_rules": [
+      {
+        "step": 1,
+        "rule": "City standardised: strip spaces + title case -> exactly 6 cities",
+        "changed": 476
+      },
+      {
+        "step": 2,
+        "rule": "Gender mapped to male/female/unknown (blank -> unknown)",
+        "changed": 495
+      },
+      {
+        "step": 3,
+        "rule": "Ages outside 10-100 set to missing, then filled with the median age of the customer's city (groupby + transform)",
+        "changed": 67,
+        "of_which_out_of_range": 6
+      },
+      {
+        "step": 4,
+        "rule": "signup_date converted to a datetime",
+        "changed": 1200
+      }
+    ],
+    "orders_rules": [
+      {
+        "step": 1,
+        "rule": "order_ts converted to a datetime",
+        "changed": 13084
+      },
+      {
+        "step": 2,
+        "rule": "Exact duplicate rows removed",
+        "changed": 119
+      },
+      {
+        "step": 3,
+        "rule": "Kept only the record with the latest order_ts per order_id (drops the earlier 'pending' records)",
+        "changed": 656
+      },
+      {
+        "step": 4,
+        "rule": "order_amount to numeric; unparseable entries refilled as round(price*qty*(1-discount/100), 2)",
+        "changed": 112
+      },
+      {
+        "step": 5,
+        "rule": "Negative delivery_minutes set to missing",
+        "changed": 105
+      },
+      {
+        "step": 6,
+        "rule": "Completed orders: missing delivery_minutes filled with the category median among completed orders",
+        "changed": 774
+      },
+      {
+        "step": 7,
+        "rule": "Cancelled orders: delivery_minutes left missing (never delivered, imputing would invent data)",
+        "changed": 1199
+      }
+    ],
+    "city_counts": {
+      "Pune": 227,
+      "Delhi": 210,
+      "Bengaluru": 197,
+      "Chennai": 191,
+      "Hyderabad": 191,
+      "Mumbai": 184
+    },
+    "gender_counts": {
+      "female": 610,
+      "male": 560,
+      "unknown": 30
+    },
+    "age_min": 18.0,
+    "age_max": 60.0,
+    "missing_ages": 0,
+    "after": {
+      "order_rows": 12309,
+      "completed": 11110,
+      "cancelled": 1199,
+      "pending": 0,
+      "missing_order_amount": 0,
+      "missing_delivery_completed": 0,
+      "missing_delivery_cancelled": 1199,
+      "completed_amount_sum": 2998668.8
+    }
+  },
+  "validation": {
+    "total": 28,
+    "failed": [],
+    "status": "ALL CHECKPOINTS PASSED"
+  },
+  "sql": {
+    "q1_customers": 30,
+    "q2_rows": 30,
+    "q2_total": 2998668.8,
+    "q2_max_cell": {
+      "city": "Bengaluru",
+      "category": "Electronics",
+      "revenue": 233909.45
+    },
+    "q3_products": 11,
+    "q4_customers": 25,
+    "q5_customers": 550,
+    "q5_average": 2552.06,
+    "q6_top_per_city": [
+      {
+        "city": "Bengaluru",
+        "customer_id": "C0082",
+        "total_spend": 12856.2
+      },
+      {
+        "city": "Chennai",
+        "customer_id": "C0930",
+        "total_spend": 10151.4
+      },
+      {
+        "city": "Delhi",
+        "customer_id": "C0291",
+        "total_spend": 13742.6
+      },
+      {
+        "city": "Hyderabad",
+        "customer_id": "C0743",
+        "total_spend": 12730.05
+      },
+      {
+        "city": "Mumbai",
+        "customer_id": "C0693",
+        "total_spend": 14766.55
+      },
+      {
+        "city": "Pune",
+        "customer_id": "C0426",
+        "total_spend": 10377.1
+      }
+    ],
+    "q6_rank_ne_row_number": 8,
+    "q7_days": 183,
+    "q7_last_cumulative": 2998668.8,
+    "all_queries_match_references": true,
+    "failures": []
+  },
+  "eda": {
+    "pivot_grand_total": 2998668.8,
+    "sql_total_matches_pivot": true,
+    "per_city_named_agg": [
+      {
+        "city": "Bengaluru",
+        "sum": 523643.4,
+        "mean": 276.47,
+        "count": 1894
+      },
+      {
+        "city": "Chennai",
+        "sum": 463629.15,
+        "mean": 272.72,
+        "count": 1700
+      },
+      {
+        "city": "Delhi",
+        "sum": 502829.8,
+        "mean": 243.62,
+        "count": 2064
+      },
+      {
+        "city": "Hyderabad",
+        "sum": 528589.9,
+        "mean": 284.95,
+        "count": 1855
+      },
+      {
+        "city": "Mumbai",
+        "sum": 479058.5,
+        "mean": 297.0,
+        "count": 1613
+      },
+      {
+        "city": "Pune",
+        "sum": 500918.05,
+        "mean": 252.48,
+        "count": 1984
+      }
+    ],
+    "distribution": {
+      "mean": 269.91,
+      "median": 135.0,
+      "skewness": 4.61,
+      "q1": 64.8,
+      "q3": 297.0,
+      "iqr": 232.2,
+      "lower_fence": -283.5,
+      "upper_fence": 645.3,
+      "outliers_below": 0,
+      "outliers_above": 897
+    },
+    "correlation_matrix": {
+      "order_amount": {
+        "order_amount": 1.0,
+        "discount_pct": -0.095,
+        "quantity": 0.087,
+        "delivery_minutes": -0.003
+      },
+      "discount_pct": {
+        "order_amount": -0.095,
+        "discount_pct": 1.0,
+        "quantity": -0.0,
+        "delivery_minutes": -0.01
+      },
+      "quantity": {
+        "order_amount": 0.087,
+        "discount_pct": -0.0,
+        "quantity": 1.0,
+        "delivery_minutes": -0.013
+      },
+      "delivery_minutes": {
+        "order_amount": -0.003,
+        "discount_pct": -0.01,
+        "quantity": -0.013,
+        "delivery_minutes": 1.0
+      }
+    },
+    "largest_correlation": {
+      "pair": [
+        "order_amount",
+        "discount_pct"
+      ],
+      "value": -0.095
+    },
+    "answers_max_200_words": "What is this data about? Completed Instamart orders in six metro cities from April to September 2025: 11,110 orders by 1,175 customers over a 40-product catalogue, each row holding amount, discount, quantity and delivery minutes. What do the distributions look like? Amounts average INR 269.91 but the median is only INR 135.00 and skewness is about 4.61 \u2014 a long right tail of a few large electronics baskets. Are there outliers or anomalies? Yes: the 1.5xIQR fences (Q1 64.80, Q3 297.00) put 897 orders above the upper fence of 645.30 and none below the lower fence; they are genuine big-basket orders, not data errors. What relationships exist? All correlations are weak: the largest in absolute value is order_amount with discount_pct at about -0.095 (order_amount with quantity is +0.087, slightly smaller). Bigger discounts pair with slightly bigger orders, but a correlation this small explains almost no variance \u2014 it does not establish causation.",
+    "answers_word_count": 152
+  },
+  "segments": {
+    "rfm_stats": {
+      "customers": 1175,
+      "recency_median": 19,
+      "recency_min": 0,
+      "recency_max": 180,
+      "frequency_mean": 9.46,
+      "frequency_max": 33,
+      "monetary_mean": 2552.06,
+      "monetary_max": 14766.55
+    },
+    "kmeans_table": [
+      {
+        "k": 2,
+        "inertia": 1820.8,
+        "silhouette": 0.465
+      },
+      {
+        "k": 3,
+        "inertia": 1268.2,
+        "silhouette": 0.445
+      },
+      {
+        "k": 4,
+        "inertia": 743.1,
+        "silhouette": 0.526
+      },
+      {
+        "k": 5,
+        "inertia": 617.4,
+        "silhouette": 0.48
+      },
+      {
+        "k": 6,
+        "inertia": 503.2,
+        "silhouette": 0.482
+      },
+      {
+        "k": 7,
+        "inertia": 408.5,
+        "silhouette": 0.416
+      },
+      {
+        "k": 8,
+        "inertia": 366.5,
+        "silhouette": 0.412
+      }
+    ],
+    "chosen_k": 4,
+    "chosen_k_reason": "K=4 has the highest silhouette score (0.526) of {3, 4, 5} and splits the base into four actionable plays; cluster numbers are only labels with no ordering.",
+    "k_lower_inertia_cannot_pick": "Inertia always falls as K grows because more centroids cut the squared distances (it would reach 0 at K = n), so a lower value alone rewards overfitting; the elbow, the silhouette and business interpretability pick K.",
+    "segments_profile": [
+      {
+        "segment_id": 0,
+        "segment_name": "At-Risk High Value",
+        "recommended_action": "Win back within 7 days: personal offers and follow-up calls",
+        "size": 436,
+        "recency_mean": 28.9,
+        "frequency_mean": 3.8,
+        "monetary_mean": 1057.62,
+        "is_premium": false
+      },
+      {
+        "segment_id": 1,
+        "segment_name": "Premium",
+        "recommended_action": "Protect: priority support, early access, loyalty perks",
+        "size": 138,
+        "recency_mean": 24.1,
+        "frequency_mean": 6.8,
+        "monetary_mean": 7129.7,
+        "is_premium": true
+      },
+      {
+        "segment_id": 2,
+        "segment_name": "Loyal Regulars",
+        "recommended_action": "Reward and upsell: bundles, subscriptions, referral nudges",
+        "size": 419,
+        "recency_mean": 8.8,
+        "frequency_mean": 19.4,
+        "monetary_mean": 3410.02,
+        "is_premium": false
+      },
+      {
+        "segment_id": 3,
+        "segment_name": "Occasional Shoppers",
+        "recommended_action": "Nudge with coupons and reminders to rebuild the habit",
+        "size": 182,
+        "recency_mean": 109.0,
+        "frequency_mean": 2.2,
+        "monetary_mean": 685.99,
+        "is_premium": false
+      }
+    ],
+    "pca_explained_variance_ratio": [
+      0.634,
+      0.218
+    ],
+    "pca_total": 0.852
+  },
+  "lapse": {
+    "cohort_customers": 1156,
+    "lapsed": 443,
+    "lapsed_pct": 38.32,
+    "train_rows": 924,
+    "test_rows": 232,
+    "baseline": {
+      "accuracy": 0.616,
+      "f1_lapsed": 0.0
+    },
+    "logistic_regression": {
+      "best_params": {
+        "C": 100
+      },
+      "best_cv_f1": 0.651,
+      "test": {
+        "precision": 0.644,
+        "recall": 0.652,
+        "f1": 0.648,
+        "confusion_matrix": [
+          [
+            111,
+            32
+          ],
+          [
+            31,
+            58
+          ]
+        ]
+      }
+    },
+    "random_forest": {
+      "best_params": {
+        "max_depth": 8,
+        "min_samples_leaf": 10
+      },
+      "best_cv_f1": 0.681,
+      "test": {
+        "precision": 0.659,
+        "recall": 0.652,
+        "f1": 0.655,
+        "confusion_matrix": [
+          [
+            113,
+            30
+          ],
+          [
+            31,
+            58
+          ]
+        ]
+      }
+    },
+    "selected_model": "random_forest",
+    "selected_test": {
+      "precision": 0.659,
+      "recall": 0.652,
+      "f1": 0.655,
+      "confusion_matrix": [
+        [
+          113,
+          30
+        ],
+        [
+          31,
+          58
+        ]
+      ]
+    },
+    "balanced_train": {
+      "rows": 1140,
+      "per_class": 570
+    },
+    "balanced_experiment": {
+      "model": "logistic_regression",
+      "unbalanced_lr_test": {
+        "precision": 0.644,
+        "recall": 0.652,
+        "f1": 0.648,
+        "confusion_matrix": [
+          [
+            111,
+            32
+          ],
+          [
+            31,
+            58
+          ]
+        ]
+      },
+      "balanced_lr_test": {
+        "precision": 0.589,
+        "recall": 0.854,
+        "f1": 0.697,
+        "confusion_matrix": [
+          [
+            90,
+            53
+          ],
+          [
+            13,
+            76
+          ]
+        ]
+      },
+      "reading": "Recall moves most: the balanced refit catches far more lapsing customers, while precision stays near the same level, so the retention team buys coverage at a similar cost of wasted targets."
+    },
+    "top5_importances": [
+      {
+        "feature": "frequency",
+        "importance": 0.2796
+      },
+      {
+        "feature": "monetary",
+        "importance": 0.2712
+      },
+      {
+        "feature": "recency",
+        "importance": 0.1151
+      },
+      {
+        "feature": "avg_delivery_minutes",
+        "importance": 0.0613
+      },
+      {
+        "feature": "cancel_rate",
+        "importance": 0.0523
+      }
+    ],
+    "lr_signs": [
+      {
+        "feature": "recency",
+        "coefficient": 0.0396,
+        "sign": "positive"
+      },
+      {
+        "feature": "frequency",
+        "coefficient": -1.6982,
+        "sign": "negative"
+      },
+      {
+        "feature": "monetary",
+        "coefficient": 0.2846,
+        "sign": "positive"
+      }
+    ],
+    "scaler_means": {
+      "learned_frequency_mean_train_only": 8.115,
+      "full_cohort_frequency_mean": 8.029,
+      "why_differ": "The scaler is fitted on the 924 training rows only, so its learned mean is the training split's mean of frequency, not the full cohort's."
+    },
+    "retention_list_rows": 10,
+    "retention_truly_lapsed": 1,
+    "leakage_statement": "No encoder, scaler or resampler saw test rows; no order dated on or after 2025-09-01 entered the features; the task-3 segment labels were not used as features.",
+    "retention_caveat": "The Premium flag comes from the whole-window RFM (which includes the September window that defines the lapse label), so the retention list is illustrative and not a leakage-free evaluation."
+  },
+  "triage": {
+    "tickets_total": 164,
+    "empty_tickets": 4,
+    "long_tickets": 4,
+    "redaction": {
+      "email": 55,
+      "phone": 91,
+      "order_id": 132,
+      "total": 278,
+      "left_after": 0
+    },
+    "retries_per_full_run": 19,
+    "retry_log_sample": [
+      "retry ticket=T0002 retry_no=0 wait=0.0530s error=503 server busy",
+      "retry ticket=T0116 retry_no=0 wait=0.0453s error=503 server busy",
+      "retry ticket=T0153 retry_no=0 wait=0.0484s error=503 server busy"
+    ],
+    "retry_log_full": [
+      "retry ticket=T0002 retry_no=0 wait=0.0530s error=503 server busy",
+      "retry ticket=T0116 retry_no=0 wait=0.0453s error=503 server busy",
+      "retry ticket=T0153 retry_no=0 wait=0.0484s error=503 server busy",
+      "retry ticket=T0039 retry_no=0 wait=0.0478s error=503 server busy",
+      "retry ticket=T0152 retry_no=0 wait=0.0542s error=503 server busy",
+      "retry ticket=T0043 retry_no=0 wait=0.0535s error=503 server busy",
+      "retry ticket=T0111 retry_no=0 wait=0.0562s error=503 server busy",
+      "retry ticket=T0155 retry_no=0 wait=0.0461s error=503 server busy",
+      "retry ticket=T0100 retry_no=0 wait=0.0503s error=503 server busy",
+      "retry ticket=T0068 retry_no=0 wait=0.0454s error=503 server busy",
+      "retry ticket=T0135 retry_no=0 wait=0.0477s error=503 server busy",
+      "retry ticket=T0009 retry_no=0 wait=0.0513s error=503 server busy",
+      "retry ticket=T0067 retry_no=0 wait=0.0453s error=503 server busy",
+      "retry ticket=T0106 retry_no=0 wait=0.0475s error=503 server busy",
+      "retry ticket=T0097 retry_no=0 wait=0.0531s error=503 server busy",
+      "retry ticket=T0003 retry_no=0 wait=0.0518s error=503 server busy",
+      "retry ticket=T0019 retry_no=0 wait=0.0478s error=503 server busy",
+      "retry ticket=T0086 retry_no=0 wait=0.0524s error=503 server busy",
+      "retry ticket=T0065 retry_no=0 wait=0.0551s error=503 server busy"
+    ],
+    "zero_shot": {
+      "run_label": "zero-shot no budget",
+      "tickets": 164,
+      "statuses": {
+        "classified_json": 135,
+        "skipped_empty": 4,
+        "flagged_long": 4,
+        "classified_keyword": 12,
+        "flagged_invalid_output": 9
+      },
+      "classified": 147,
+      "accuracy_over_classified": 85.7,
+      "total_tokens": 11584,
+      "tokens_per_classified_ticket": 78.8,
+      "retries": 19,
+      "redaction": {
+        "email": 55,
+        "phone": 91,
+        "order_id": 132,
+        "total": 278,
+        "left_after": 0
+      }
+    },
+    "few_shot": {
+      "run_label": "few-shot no budget",
+      "tickets": 164,
+      "statuses": {
+        "classified_json": 135,
+        "skipped_empty": 4,
+        "flagged_long": 4,
+        "classified_keyword": 12,
+        "flagged_invalid_output": 9
+      },
+      "classified": 147,
+      "accuracy_over_classified": 100.0,
+      "total_tokens": 23752,
+      "tokens_per_classified_ticket": 161.6,
+      "retries": 19,
+      "redaction": {
+        "email": 55,
+        "phone": 91,
+        "order_id": 132,
+        "total": 278,
+        "left_after": 0
+      }
+    },
+    "confusion_zero_shot": [
+      {
+        "true": "billing",
+        "predicted": "billing",
+        "n": 38
+      },
+      {
+        "true": "delivery",
+        "predicted": "delivery",
+        "n": 36
+      },
+      {
+        "true": "technical",
+        "predicted": "billing",
+        "n": 10
+      },
+      {
+        "true": "technical",
+        "predicted": "technical",
+        "n": 29
+      },
+      {
+        "true": "fraud",
+        "predicted": "billing",
+        "n": 11
+      },
+      {
+        "true": "fraud",
+        "predicted": "fraud",
+        "n": 23
+      }
+    ],
+    "budget_demo": {
+      "budget": 6000,
+      "exhausted": 75
+    },
+    "final_run_statuses": {
+      "classified_json": 135,
+      "skipped_empty": 4,
+      "flagged_long": 4,
+      "classified_keyword": 12,
+      "flagged_invalid_output": 9
+    },
+    "routing_counts": {
+      "support_queue": 102,
+      "security_team": 34,
+      "human_review": 17,
+      "premium_desk": 11
+    },
+    "priority_counts": {
+      "NORMAL": 119,
+      "HIGH": 45
+    },
+    "zero_shot_system_prompt": "You are the Instamart support-ticket classifier. CLASSIFY every customer ticket into exactly one of these four categories: billing, delivery, technical, fraud. Reply with JSON only, in the form {\"category\": \"...\", \"reason\": \"...\"}. No other text.",
+    "few_shot_system_prompt": "You are the Instamart support-ticket classifier. CLASSIFY every customer ticket into exactly one of these four categories: billing, delivery, technical, fraud. Reply with JSON only, in the form {\"category\": \"...\", \"reason\": \"...\"}. No other text. EXAMPLES:\nT: I was charged twice for my order, please refund the extra payment. -> {\"category\": \"billing\", \"reason\": \"duplicate charge and refund request\"}\nT: Someone hacked my account and used my wallet balance. This is fraud. -> {\"category\": \"fraud\", \"reason\": \"unauthorized account access\"}\nT: The app crashes every time I open the cart. -> {\"category\": \"technical\", \"reason\": \"app crash reported\"}"
+  },
+  "policy": {
+    "total_chunks": 15,
+    "chunk_counts": {
+      "delivery_policy.txt": 3,
+      "escalation_policy.txt": 3,
+      "payment_policy.txt": 3,
+      "privacy_policy.txt": 2,
+      "refund_policy.txt": 4
+    },
+    "tfidf_explanation": "TF measures how often a word occurs inside a chunk; IDF down-weights words that occur across many chunks, so policy-specific terms drive the similarity. Limitation: TF-IDF is purely lexical, so two phrasings with the same meaning but different words ('money back' vs 'refund') never match.",
+    "retrieval_sample": {
+      "query": "refund policy late delivery",
+      "sources": [
+        "refund_policy.txt",
+        "refund_policy.txt",
+        "refund_policy.txt"
+      ]
+    },
+    "eval_overlap10": {
+      "overlap": 10,
+      "doc_hits": 12,
+      "fact_hits": 12,
+      "fallback_hits": 2,
+      "answerable": 12,
+      "unanswerable": 2,
+      "rows": [
+        {
+          "question": "What delivery time makes a completed order eligible for a full refund?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "more than 45 minutes",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "order is delivered in more than 45 minutes, the customer receives a full refund of the order amount.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Who must approve a refund above INR 1000?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "human support lead",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "A refund above INR 1000 must be approved by a human support lead before money is returned.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How many days do I have to raise a refund request?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "within 7 days",
+          "sources": [
+            "refund_policy.txt",
+            "privacy_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "A refund request must be raised within 7 days of the delivery date.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "What is the delivery fee on small orders?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "INR 25",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "A delivery fee of INR 25 is charged on orders below INR 199,\n  of INR 25 is charged on orders below INR 199, and delivery is free on orders of INR 199 or more.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "On orders of what value is delivery free?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "INR 199 or more",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "of INR 25 is charged on orders below INR 199, and delivery is free on orders of INR 199 or more.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Why does the electronics delivery need a one time password?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "one time password",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "Electronics items are delivered only after the customer shares a one time password with the rider.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Is cash on delivery available for a large order?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "INR 2500",
+          "sources": [
+            "payment_policy.txt",
+            "payment_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "Cash on delivery is available only for orders up to INR 2500.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How soon is money returned when a payment fails but is deducted?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "48 hours",
+          "sources": [
+            "payment_policy.txt",
+            "payment_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "If a payment fails but money is deducted, the amount is returned automatically\n  fails but money is deducted, the amount is returned automatically within 48 hours.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Can wallet balance be refunded as cash?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "never refunded as cash",
+          "sources": [
+            "payment_policy.txt",
+            "payment_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "Wallet balance can be used for any order and is never refunded as cash.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "When are delivery addresses deleted from active systems?",
+          "expected_doc": "privacy_policy.txt",
+          "expected_fact": "180 days",
+          "sources": [
+            "privacy_policy.txt",
+            "privacy_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "Delivery addresses are deleted from active systems 180 days after\n  Delivery addresses are deleted from active systems 180 days after the last order.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How fast must a fraud ticket reach the security team?",
+          "expected_doc": "escalation_policy.txt",
+          "expected_fact": "within 2 hours",
+          "sources": [
+            "escalation_policy.txt",
+            "escalation_policy.txt",
+            "escalation_policy.txt"
+          ],
+          "answer": "A ticket about fraud or an unauthorized transaction is marked high priority and sent to the security team within 2 hours.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "After how many steps must an automated assistant hand over to a human?",
+          "expected_doc": "escalation_policy.txt",
+          "expected_fact": "6 steps",
+          "sources": [
+            "escalation_policy.txt",
+            "escalation_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "If an automated assistant cannot resolve a ticket within 6 steps, it must hand the case to a human agent with a short summary.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "What is the favourite colour of the company mascot?",
+          "expected_doc": "NONE",
+          "expected_fact": "",
+          "sources": [
+            "delivery_policy.txt",
+            "refund_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "I could not find that information in the policy documents.",
+          "fallback_hit": true,
+          "doc_hit": null,
+          "fact_hit": null
+        },
+        {
+          "question": "Who won the cricket world cup final?",
+          "expected_doc": "NONE",
+          "expected_fact": "",
+          "sources": [
+            "payment_policy.txt",
+            "delivery_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "I could not find that information in the policy documents.",
+          "fallback_hit": true,
+          "doc_hit": null,
+          "fact_hit": null
+        }
+      ],
+      "failures": []
+    },
+    "eval_overlap0": {
+      "overlap": 0,
+      "doc_hits": 12,
+      "fact_hits": 10,
+      "fallback_hits": 2,
+      "answerable": 12,
+      "unanswerable": 2,
+      "rows": [
+        {
+          "question": "What delivery time makes a completed order eligible for a full refund?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "more than 45 minutes",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "receives a full refund of the order amount.",
+          "doc_hit": true,
+          "fact_hit": false,
+          "fallback_hit": null
+        },
+        {
+          "question": "Who must approve a refund above INR 1000?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "human support lead",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "A refund above INR\n  1000 must be approved by a human support lead before money is returned.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How many days do I have to raise a refund request?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "within 7 days",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "A refund request must be raised within 7 days of the delivery date.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "What is the delivery fee on small orders?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "INR 25",
+          "sources": [
+            "delivery_policy.txt",
+            "payment_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "A delivery fee of INR 25 is charged on orders below INR 199,\n  Payment Policy.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "On orders of what value is delivery free?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "INR 199 or more",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "A delivery fee of INR 25 is charged on orders below INR 199,\n  and delivery is free on orders of INR 199 or more.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Why does the electronics delivery need a one time password?",
+          "expected_doc": "delivery_policy.txt",
+          "expected_fact": "one time password",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "Electronics items are delivered only after the customer shares a one time password with the rider.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "Is cash on delivery available for a large order?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "INR 2500",
+          "sources": [
+            "payment_policy.txt",
+            "payment_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "Cash on delivery is available only for orders up to INR 2500.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How soon is money returned when a payment fails but is deducted?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "48 hours",
+          "sources": [
+            "payment_policy.txt",
+            "refund_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "If a payment fails but money is deducted, the amount is returned automatically\n  1000 must be approved by a human support lead before money is returned.",
+          "doc_hit": true,
+          "fact_hit": false,
+          "fallback_hit": null
+        },
+        {
+          "question": "Can wallet balance be refunded as cash?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "never refunded as cash",
+          "sources": [
+            "payment_policy.txt",
+            "payment_policy.txt",
+            "payment_policy.txt"
+          ],
+          "answer": "Wallet balance can be used for any order and is never refunded as cash.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "When are delivery addresses deleted from active systems?",
+          "expected_doc": "privacy_policy.txt",
+          "expected_fact": "180 days",
+          "sources": [
+            "privacy_policy.txt",
+            "delivery_policy.txt",
+            "escalation_policy.txt"
+          ],
+          "answer": "Delivery addresses are deleted from active systems 180 days after\n  Delivery Policy.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "How fast must a fraud ticket reach the security team?",
+          "expected_doc": "escalation_policy.txt",
+          "expected_fact": "within 2 hours",
+          "sources": [
+            "escalation_policy.txt",
+            "escalation_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "A ticket about fraud or an unauthorized transaction is marked high priority and sent to the security team within 2 hours.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "After how many steps must an automated assistant hand over to a human?",
+          "expected_doc": "escalation_policy.txt",
+          "expected_fact": "6 steps",
+          "sources": [
+            "escalation_policy.txt",
+            "refund_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "an automated assistant cannot resolve a ticket within 6 steps, it must hand the case to a human agent with a short summary.",
+          "doc_hit": true,
+          "fact_hit": true,
+          "fallback_hit": null
+        },
+        {
+          "question": "What is the favourite colour of the company mascot?",
+          "expected_doc": "NONE",
+          "expected_fact": "",
+          "sources": [
+            "delivery_policy.txt",
+            "delivery_policy.txt",
+            "refund_policy.txt"
+          ],
+          "answer": "I could not find that information in the policy documents.",
+          "fallback_hit": true,
+          "doc_hit": null,
+          "fact_hit": null
+        },
+        {
+          "question": "Who won the cricket world cup final?",
+          "expected_doc": "NONE",
+          "expected_fact": "",
+          "sources": [
+            "payment_policy.txt",
+            "privacy_policy.txt",
+            "delivery_policy.txt"
+          ],
+          "answer": "I could not find that information in the policy documents.",
+          "fallback_hit": true,
+          "doc_hit": null,
+          "fact_hit": null
+        }
+      ],
+      "failures": [
+        {
+          "question": "What delivery time makes a completed order eligible for a full refund?",
+          "expected_doc": "refund_policy.txt",
+          "expected_fact": "more than 45 minutes",
+          "sources": [
+            "refund_policy.txt",
+            "refund_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "receives a full refund of the order amount.",
+          "doc_hit": true,
+          "fact_hit": false,
+          "fallback_hit": null
+        },
+        {
+          "question": "How soon is money returned when a payment fails but is deducted?",
+          "expected_doc": "payment_policy.txt",
+          "expected_fact": "48 hours",
+          "sources": [
+            "payment_policy.txt",
+            "refund_policy.txt",
+            "privacy_policy.txt"
+          ],
+          "answer": "If a payment fails but money is deducted, the amount is returned automatically\n  1000 must be approved by a human support lead before money is returned.",
+          "doc_hit": true,
+          "fact_hit": false,
+          "fallback_hit": null
+        }
+      ]
+    },
+    "zero_overlap_reading": "With 40-word chunks and zero overlap at least one answerable question breaks because its answer sentence straddles a chunk boundary, so the retrieved chunks never contain the complete sentence that holds the expected fact."
+  },
+  "agent": {
+    "scenarios": [
+      {
+        "scenario_id": "S1",
+        "status": "REFUND",
+        "final_answer": "REFUND: INR 128.25 issued.",
+        "llm_calls": 5,
+        "tokens_used": 1037,
+        "tools": [
+          "get_order",
+          "search_policy",
+          "calculate_refund",
+          "issue_refund"
+        ],
+        "refund_inr": 128.25,
+        "message": "My order ORD-100048 reached me very late. I would like a refund."
+      },
+      {
+        "scenario_id": "S2",
+        "status": "REFUND",
+        "final_answer": "REFUND: INR 135.0 issued.",
+        "llm_calls": 5,
+        "tokens_used": 1037,
+        "tools": [
+          "get_order",
+          "search_policy",
+          "calculate_refund",
+          "issue_refund"
+        ],
+        "refund_inr": 135.0,
+        "message": "My order ORD-100067 reached me very late. I would like a refund."
+      },
+      {
+        "scenario_id": "S3",
+        "status": "ESCALATE",
+        "final_answer": "ESCALATE: refund above INR 1000 sent to a human lead.",
+        "llm_calls": 5,
+        "tokens_used": 1024,
+        "tools": [
+          "get_order",
+          "search_policy",
+          "calculate_refund",
+          "escalate_to_human"
+        ],
+        "refund_inr": 1999.0,
+        "message": "Order ORD-100145 arrived far too late, please refund me."
+      },
+      {
+        "scenario_id": "S4",
+        "status": "DENIED",
+        "final_answer": "DENIED: delivery was within 45 minutes.",
+        "llm_calls": 4,
+        "tokens_used": 717,
+        "tools": [
+          "get_order",
+          "search_policy",
+          "calculate_refund"
+        ],
+        "refund_inr": 0.0,
+        "message": "Please refund order ORD-100001, I did not like the delivery."
+      },
+      {
+        "scenario_id": "S5",
+        "status": "DENIED",
+        "final_answer": "DENIED: only completed orders can be refunded.",
+        "llm_calls": 3,
+        "tokens_used": 421,
+        "tools": [
+          "get_order",
+          "search_policy"
+        ],
+        "refund_inr": 0.0,
+        "message": "I want my money back for order ORD-100025."
+      },
+      {
+        "scenario_id": "S6",
+        "status": "NOT_FOUND",
+        "final_answer": "NOT_FOUND: no such order.",
+        "llm_calls": 2,
+        "tokens_used": 128,
+        "tools": [
+          "get_order"
+        ],
+        "refund_inr": 0.0,
+        "message": "Refund for order ORD-999999 please."
+      },
+      {
+        "scenario_id": "S7",
+        "status": "FALLBACK_MAX_ITERATIONS",
+        "final_answer": "HANDOFF: no final answer within 6 model calls \u2014 handing the case to a human agent. Tools executed so far: search_policy, search_policy, search_policy, search_policy, search_policy, search_policy.",
+        "llm_calls": 6,
+        "tokens_used": 3168,
+        "tools": [
+          "search_policy",
+          "search_policy",
+          "search_policy",
+          "search_policy",
+          "search_policy",
+          "search_policy"
+        ],
+        "refund_inr": 0.0,
+        "message": "[LOOP] Refund order ORD-100048."
+      }
+    ],
+    "expected_all_matched": true,
+    "stop_safely": {
+      "s1_token_limit_200": {
+        "status": "FALLBACK_TOKEN_LIMIT",
+        "llm_calls": 3,
+        "tokens_used": 438
+      },
+      "timeout_time_limit_0": {
+        "status": "FALLBACK_TIMEOUT",
+        "llm_calls": 0
+      }
+    },
+    "crash_resume": {
+      "run_id": "demo-crash-resume-S1",
+      "status": "REFUND",
+      "final_answer": "REFUND: INR 128.25 issued.",
+      "tools_in_order": [
+        "get_order",
+        "search_policy",
+        "calculate_refund",
+        "issue_refund"
+      ],
+      "refund_inr": 128.25
+    },
+    "react_comparison": "ReAct spends one model call per decision: measured on our runs, S1 took 5 calls (get_order, search_policy, calculate_refund, issue_refund, final answer), the cancelled-order case S5 took 3 and the unknown-order case S6 took 2, at a few hundred to a few thousand estimated tokens each. A plan-and-execute design would ask the model for the whole step list once and replan only on error: the happy path needs about 2 calls instead of 5, but an unexpected observation such as NOT_FOUND or a cancelled order invalidates the remaining planned steps and forces a replanning round trip anyway, so the saving shrinks exactly where it matters. Because each tool's arguments here depend on the previous observation (the order id, then the retrieved policy, then the calculated amount), ReAct reacts to reality at every hop with no wasted plans. I would keep ReAct for this refund workflow: the sequences are short and strictly ordered, its extra calls are bounded by the max-iteration, token and time stop-safely limits, and a one-shot plan cannot anticipate which branch the order data will justify.",
+    "react_comparison_words": 177,
+    "tools_spec": [
+      {
+        "name": "get_order",
+        "description": "Look up one order by id in the clean Instamart database.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "order_id"
+          ]
+        }
+      },
+      {
+        "name": "search_policy",
+        "description": "Search the policy documents with TF-IDF retrieval and return the top chunks.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "query"
+          ]
+        }
+      },
+      {
+        "name": "calculate_refund",
+        "description": "Apply the refund rules to an order amount and delivery time.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "order_amount": {
+              "type": "number"
+            },
+            "delivery_minutes": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "order_amount",
+            "delivery_minutes"
+          ]
+        }
+      },
+      {
+        "name": "issue_refund",
+        "description": "Issue the refund and record it in the refund ledger.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string"
+            },
+            "refund_inr": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "order_id",
+            "refund_inr"
+          ]
+        }
+      },
+      {
+        "name": "escalate_to_human",
+        "description": "Send a refund above INR 1000 to a human support lead and record it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "order_id": {
+              "type": "string"
+            },
+            "refund_inr": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "order_id",
+            "refund_inr"
+          ]
+        }
+      }
+    ]
+  }
+}
