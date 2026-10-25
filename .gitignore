@@ -19,3 +19,8 @@ frontend/dist/
 .screenshots/
 test_reports/
 memory/
+
+# --- build-template scaffolding (not part of the capstone) ---
+TEMPLATE.md
+design_guidelines.json
+plan/
