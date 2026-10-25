@@ -13,7 +13,7 @@ One internal tool, four connected parts, built on synthetic (fictional, seeded) 
 
 Everything runs offline: every language-model call goes through the supplied `mock_llm.py` (unmodified) — no API key, no network, no cost. All money is in Indian Rupees (INR); no dollar sign appears anywhere in this repository.
 
-**The web Copilot app.** This repository also ships a web UI for the Head of Customer Experience and the support desk (FastAPI in `backend/`, React 19 + TypeScript in `frontend/`). It renders the real pipeline outputs — raw audit figures, cleaning-rule counts, SQL results, segment explorer with the retention list, lapse model card, the routed ticket ledger with filters, a live grounded policy Q&A and a live refund-agent runner with the tool timeline. It reads the committed pipeline outputs (plus `live_refund_ledger.jsonl` for live agent runs, so the graded artifacts stay untouched); no feature is mocked. Running it is optional for grading:
+**The web Copilot app.** This repository also ships a web UI for the Head of Customer Experience and the support desk (FastAPI in `backend/`, React 19 + TypeScript in `frontend/`). It renders the real pipeline outputs — raw audit figures, cleaning-rule counts, SQL results, segment explorer with the retention list, lapse model card, the routed ticket ledger with filters, a live grounded policy Q&A and a live refund-agent runner with the tool timeline. It reads the committed pipeline outputs (plus `live_refund_ledger.jsonl` for live agent runs, so the graded artifacts stay untouched); no feature is mocked.
 
 ```shell
 cd backend && uvicorn server:app --host 0.0.0.0 --port 8001   # serves /api, reads outputs/
