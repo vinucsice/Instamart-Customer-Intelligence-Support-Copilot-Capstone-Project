@@ -4,12 +4,12 @@
 
 One internal tool, four connected parts, built on synthetic (fictional, seeded) Instamart data:
 
-| Part | What it does | Marks |
+| Part | What it does |
 |---|---|---|
-| A | Audits the dirty raw exports, cleans them with documented rules, stores `customers` / `products` / `orders` in SQLite + CSV, answers seven business questions in SQL and cross-checks them in pandas | 22 |
-| B | Builds the RFM table, K-means segments (named, with a Premium flag), and a leakage-safe lapse-prediction model plus a Premium retention watch-list | 28 |
-| C | Triages the 164 support tickets behind input guardrails, PII redaction, retries, strict output validation and a token budget, then routes them using the Part B segments | 22 |
-| D | Grounds a policy Q&A assistant in TF-IDF retrieval over the five policy documents and runs a five-tool refund agent (order lookup, policy search, refund calculation, issue/escalate) over seven scenarios with stop-safely limits, checkpoints and resume | 28 |
+| A | Audits the dirty raw exports, cleans them with documented rules, stores `customers` / `products` / `orders` in SQLite + CSV, answers seven business questions in SQL and cross-checks them in pandas 
+| B | Builds the RFM table, K-means segments (named, with a Premium flag), and a leakage-safe lapse-prediction model plus a Premium retention watch-list
+| C | Triages the 164 support tickets behind input guardrails, PII redaction, retries, strict output validation and a token budget, then routes them using the Part B segments
+| D | Grounds a policy Q&A assistant in TF-IDF retrieval over the five policy documents and runs a five-tool refund agent (order lookup, policy search, refund calculation, issue/escalate) over seven scenarios with stop-safely limits, checkpoints and resume 
 
 Everything runs offline: every language-model call goes through the supplied `mock_llm.py` (unmodified) — no API key, no network, no cost. All money is in Indian Rupees (INR); no dollar sign appears anywhere in this repository.
 
