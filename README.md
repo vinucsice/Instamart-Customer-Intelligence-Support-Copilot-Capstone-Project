@@ -5,7 +5,7 @@
 One internal tool, four connected parts, built on synthetic (fictional, seeded) Instamart data:
 
 | Part | What it does |
-|---|---|---|
+|---|---|
 | A | Audits the dirty raw exports, cleans them with documented rules, stores `customers` / `products` / `orders` in SQLite + CSV, answers seven business questions in SQL and cross-checks them in pandas 
 | B | Builds the RFM table, K-means segments (named, with a Premium flag), and a leakage-safe lapse-prediction model plus a Premium retention watch-list
 | C | Triages the 164 support tickets behind input guardrails, PII redaction, retries, strict output validation and a token budget, then routes them using the Part B segments
